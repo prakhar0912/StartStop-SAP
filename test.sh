@@ -6,10 +6,13 @@ latamData=(["peplgp01262.pi.pvt"]="D38" ["peplap07318.pi.pvt"]="D58" ["peplgp012
 
 for host in "${!latamData[@]}"
 do
-    pbrun -u "${latamData["$host"],,}"adm -h $host SHELL <<- ENDPBRUN
-    abap=$(sapcontrol -nr 00 -function GetSystemInstanceList | grep ABAP | grep -q GREEN)
-    java=$(sapcontrol -nr 00 -function GetSystemInstanceList | grep JAVA | grep -q GREEN)
-
+    sleep 2
+    pbrun -u "${latamData["$host"],,}"adm -h $host SHELL <<- "ENDPBRUN"
+    sleep 3
+    whoami
+    abap=$(sapcontrol -nr 00 -function GetSystemInstanceList | grep ABAP | grep GREEN)
+    java=$(sapcontrol -nr 00 -function GetSystemInstanceList | grep J2EE | grep GREEN)
+vi
     if [ -n "$abap" ] && [ -n "$java" ]; then
         echo $host,"${latamData["$host"],,}",ABAP and JAVA
     elif [ -n "$abap" ]; then
