@@ -11,7 +11,7 @@ elif [ -n "$abap" ]; then
 elif [ -n "$java" ]; then
     output="j2ee"
 else
-    output="Error"
+    output=""
 fi
 
 echo SID: $(whoami)
@@ -24,7 +24,7 @@ done
 
 
 echo "---------------------------------------------"
-startsap $output
+startsap
 echo "---------------------------------------------"
 
 for inst in "${instances[@]}"
