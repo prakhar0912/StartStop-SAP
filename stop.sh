@@ -6,9 +6,9 @@ java=$(sapcontrol -nr ${instances[0]} -function GetSystemInstanceList | grep J2E
 
 if [ -n "$abap" ] && [ -n "$java" ]; then
     output="ABAP and JAVA"
-elif [ -n abap ]; then
+elif [ -n "$abap" ]; then
     output="r3"
-elif [ -n java ]; then
+elif [ -n "$java" ]; then
     output="j2ee"
 else
     output="Error"
