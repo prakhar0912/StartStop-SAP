@@ -5,13 +5,13 @@ abap=$(sapcontrol -nr ${instances[0]} -function GetSystemInstanceList | grep ABA
 java=$(sapcontrol -nr ${instances[0]} -function GetSystemInstanceList | grep J2EE)
 
 if [ -n "$abap" ] && [ -n "$java" ]; then
-    output="ABAP and JAVA"
+    output="all"
 elif [ -n "$abap" ]; then
     output="r3"
 elif [ -n "$java" ]; then
     output="j2ee"
 else
-    output="Error"
+    output=""
 fi
 
 echo SID: $(whoami)
