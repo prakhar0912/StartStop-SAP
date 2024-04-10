@@ -24,7 +24,7 @@ done
 
 
 echo "---------------------------------------------"
-startsap $output
+startsap
 echo "---------------------------------------------"
 
 for inst in "${instances[@]}"
