@@ -1,5 +1,5 @@
 declare -A pirtDevSBX
-pirtDevSBX=(["pepldr03113.pi.pvt"]="Q37")
+pirtDevSBX=(["PEPLDR03104.pi.pvt"]="Q22" ["pepldr03101.pi.pvt"]="Q3A" ["peplap09406.pi.pvt"]="Q5A" ["peplap08584.pi.pvt"]="QM2" ["PEPLDZ00353.pi.pvt"]="QS2" ["PEPLDR02795.pi.pvt"]="QS2" ["PEPLGP01241.pi.pvt"]="QXA" ["pepldr03062.pi.pvt"]="T17" )
 
 
 for host in "${!pirtDevSBX[@]}"
