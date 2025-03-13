@@ -1,0 +1,10 @@
+kerV=$(./disp+work)
+sid=$(whoami)
+sid="${sid^^}"
+sid=${sid::-3}
+manifestloc="/sapmnt/${sid}/exe/uc/linuxx86_6/igs/igsmanifest.mf"
+manifest=$(cat $manifestloc)
+helperloc="/sapmnt/${sid}/exe/uc/linuxx86_6/igs/igshelpermannifest.mf"
+helper=$(cat $helperloc)
+brout=$(brtools -version)
+filesys=$(df -h)

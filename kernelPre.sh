@@ -1,5 +1,5 @@
 declare -A pirtDevSBX
-pirtDevSBX=(["PEPLDR03104.pi.pvt"]="Q22" ["pepldr03101.pi.pvt"]="Q3A" ["peplap09406.pi.pvt"]="Q5A" ["peplap08584.pi.pvt"]="QM2" ["PEPLDZ00353.pi.pvt"]="QS2" ["PEPLDR02795.pi.pvt"]="QS2" ["PEPLGP01241.pi.pvt"]="QXA" ["pepldr03062.pi.pvt"]="T17" )
+pirtDevSBX=(["peplap07963.pi.pvt"]="U16" ["peplap07968.pi.pvt"]="U16" ["pepldr03117.pi.pvt"]="U32" ["peplap07896.pi.pvt"]="U52" ["peplap09459.pi.pvt"]="U62" ["peplap09458.pi.pvt"]="U62" ["peplap09489.pi.pvt"]="U62" ["peplap09488.pi.pvt"]="U62" ["peplgp01316.pi.pvt"]="UX6" ["t01lap03580.pi.pvt"]="UX6" ["peplap09587.pi.pvt"]="UX6")
 
 
 for host in "${!pirtDevSBX[@]}"
@@ -31,14 +31,9 @@ do
     echo $inst
 done
 
-
-echo "---------------------------------------------"
-startsap $output
-echo "---------------------------------------------"
-
 for inst in "${instances[@]}"
 do
-    sapcontrol -nr $inst -function GetProcessList
+    sapcontrol -nr $inst -function GetProcessList 
     echo "--------------------------------------"
 done'
         echo -e "$script" > startScript.sh

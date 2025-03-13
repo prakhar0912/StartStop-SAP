@@ -1,63 +1,70 @@
-echo "=========================================================="
+RED="\033[0;31m"
+NC="\033[0m"
+GREEN="\033[0;32m"
 
-instances=($(startsap -c | grep -Po "\d+$"))
-abap=$(sapcontrol -nr ${instances[0]} -function GetSystemInstanceList | grep ABAP)
-java=$(sapcontrol -nr ${instances[0]} -function GetSystemInstanceList | grep J2EE)
+sid=$(whoami)
+sid="${sid^^}"
+sid=${sid::-3}
 
-if [ -n "$abap" ] && [ -n "$java" ]; then
-    output="all"
-elif [ -n "$abap" ]; then
-    output="r3"
-elif [ -n "$java" ]; then
-    output="j2ee"
-else
-    output=""
+print_err(){
+    RED="\033[0;31m"
+    NC="\033[0m"
+    GREEN="\033[0;32m"
+    echo -en "\nFailure\n"
+}
+
+print_suc(){
+    RED="\033[0;31m"
+    NC="\033[0m"
+    GREEN="\033[0;32m"
+    echo -en "\nSuccess\n"
+}
+
+
+
+checkcmd=$(startsap -c)
+
+instances=$(echo "$checkcmd" | grep -oP "Instance \K\w+$")
+instance_numbers=($(echo "$checkcmd" | grep -Po "\d+$"))
+profile="/sapmnt/${sid}/profile/DEFAULT.PFL"
+sysType=$(cat $profile 2> /dev/null | awk "/system\/type/ {print \$3}")
+stopCmdType=""
+
+echo "$sysType"
+
+if [ "$sysType" = "ABAP" ]; then
+    stopCmdType="r3"
+elif [ "$sysType" = "J2EE" ]; then
+    stopCmdType="j2ee"
 fi
 
-echo SID: $(whoami)
-echo System Type: $output
-echo Instance Numbers:
-for inst in "${instances[@]}"
+echo "$stopCmdType"
+
+
+stopcmd=$(stopsap $stopCmdType)
+
+for inst in "${instance_numbers[@]}"
 do
-    echo $inst
+    stopServiceOutput=$(sapcontrol -nr ${inst} -function StopService)
+    if [ -z "$(echo "$stopServiceOutput" | grep "OK")" ]; then
+        print_err "Stop Service command failed \n ${stopServiceOutput}"
+    fi
 done
 
-
-echo "---------------------------------------------"
-stopsap $output
-echo "---------------------------------------------"
-
-declare -a stopServiceOutput=()
-for inst in "${instances[@]}"
+for inst in "${instance_numbers[@]}"
 do
-    stopServiceOutput+=("$(sapcontrol -nr ${inst} -function StopService)")
+    cleanIpcOutput=$(cleanipc ${inst} remove all)
 done
 
-declare -a cleanIpcOutput=()
-for inst in "${instances[@]}"
+for inst in "${instance_numbers[@]}"
 do
-    cleanIpcOutput+=("$(cleanipc ${inst} remove all)")
+    processListOutput=$(sapcontrol -nr ${inst} -function GetProcessList)
+    echo -en "$processListOutput"
+    if [ -n "$(echo "$processListOutput" | grep "GREEN")" ]; then
+        print_err "Some Process is still running \n ${processListOutput}"
+        exit 0
+    fi
 done
 
-echo "Output of command: sapcontrol -nr <instance numbers> -function StopService"
-echo
-for output in "${stopServiceOutput[@]}"
-do
-    echo $output
-    echo "-----------------------------------------"
-done
-
-
-echo "Output of command: cleanipc <instance number> remove all"
-echo
-for output in "${cleanIpcOutput[@]}"
-do
-    echo $output
-    echo "-----------------------------------------"
-done
-
-for inst in "${instances[@]}"
-do
-    sapcontrol -nr $inst -function GetProcessList
-    echo "--------------------------------------"
-done
+print_suc
+exit 0

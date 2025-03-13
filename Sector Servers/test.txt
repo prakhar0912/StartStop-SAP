@@ -8,3 +8,13 @@
 ["PEPLDR02795.pi.pvt"]="QS2"
 ["PEPLGP01241.pi.pvt"]="QXA"
 ["pepldr03062.pi.pvt"]="T17"
+
+["peplgp01268.pi.pvt"]="Q38"
+["peplap07393.pi.pvt"]="Q58"
+["peplgp01269.pi.pvt"]="Q63"
+["peplap07882.pi.pvt"]="QE2"
+["peplgp01301.pi.pvt"]="QE8"
+["pepldr03057.pi.pvt"]="QX8"
+["peplap10213.pi.pvt"]="QX8"
+["peplap10212.pi.pvt"]="QX8"
+

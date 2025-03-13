@@ -32,3 +32,27 @@
 "peplap09173.pi.pvt":"UC2",
 "peplap09202.pi.pvt":"UC2",
 "peplap09185.pi.pvt":"UC2",
+
+
+
+declare -A app
+app=(
+["peplap07963.pi.pvt"]="U16"
+["peplap07968.pi.pvt"]="U16"
+["peplap07896.pi.pvt"]="U52"
+["peplap09489.pi.pvt"]="U62"
+["peplap09488.pi.pvt"]="U62"
+["peplap09587.pi.pvt"]="UX6"
+)
+
+
+declare -A ascs
+ascs=(
+["peplap09458.pi.pvt"]="U62"
+["t01lap03580.pi.pvt"]="UX6"
+)
+
+declare -A ers
+ers=(
+["peplap09459.pi.pvt"]="U62"
+)
