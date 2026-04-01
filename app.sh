@@ -1,6 +1,5 @@
-
 optionFlag=$2
-
+sendOutput=$3
 
 declare -a eur_qa
 eur_qa=(
@@ -17,6 +16,7 @@ eur_ua=(
 "peplap07963.pi.pvt:U16:APP CI"
 "peplap07968.pi.pvt:U16:APP"
 "pepldr03117.pi.pvt:U32:CIDB"
+"peplap07896.pi.pvt:U52:APP CI"
 "peplap09459.pi.pvt:U62:ERS"
 "peplap09458.pi.pvt:U62:ASCS"
 "peplap09489.pi.pvt:U62:CI"
@@ -82,6 +82,7 @@ pgcs_ua=(
 "pepldr03379.pi.pvt:UX7:DB"
 "pepldr03380.pi.pvt:UX7:DB"
 "peplap09598.pi.pvt:UX7:Observer"
+"peplap10625.pi.pvt:U47:APP"
 )
 
 declare -a pgcs_qa
@@ -101,39 +102,42 @@ global_sbx=(
 "peplgp01280.pi.pvt:D25:CIDB"
 "peplgp01305.pi.pvt:D36:CIDB"
 "pepldr03034.pi.pvt:D39:CIDB"
-"peplap07437.pi.pvt:D56:APP CI"
-"pepldh00120.pi.pvt:D56:HANA DB"
-"peplap07857.pi.pvt:D59:HANA DB"
-"pepldh00148.pi.pvt:D61:HANA DB"
-"peplap07533.pi.pvt:D61:CI"
-"pepldr02979.pi.pvt:D71:CIDB"
-"pepldh00148.pi.pvt:DC1:HANA DB"
-"peplap09441.pi.pvt:DC1:CI"
-"pepldz00640.pi.pvt:DL1:CIDB"
 "peplgp01277.pi.pvt:DX2:CIDB"
+"pepldr02979.pi.pvt:D71:CIDB"
 "pepldr03047.pi.pvt:DX9:CIDB"
 "peplgp01270.pi.pvt:S20:CIDB"
-"peplap09490.pi.pvt:S61:HANA DB"
-"pepldh00148.pi.pvt:SC1:HANA DB"
+"peplap07437.pi.pvt:D56:APP CI"
+"peplap07857.pi.pvt:D59:HANA DB"
+"peplap07533.pi.pvt:D61:CI"
+"pepldz00640.pi.pvt:DL1:CIDB"
 "peplap09442.pi.pvt:SC1:CI"
-"pepldr03672.corp.pep.pvt:S65:CIDB"
-"peplgp01309.corp.pep.pvt:S70:CIDB"
-"peplgp01315.corp.pep.pvt:D10:CIDB"
-"peplgp01274:D30:CIDB"
+"peplap09490.pi.pvt:S61:HANA DB"
+"peplap07920.pi.pvt:DH0:APP CI"
+"peplap07880.pi.pvt:SH0:APP CI"
+)
+
+declare -a global_sbxb
+global_sbxb=(
 "peplap10263.corp.pep.pvt:D5H:APP CI"
 "peplap07920.pi.pvt:DH0:APP CI"
 "peplgp01312:DX0:CIDB"
 "t01lap03299.pi.pvt:G60:CI"
-"peplgp01283.corp.pep.pvt:G6S:CIDB"
-"peplgp01311:G70:CIDB"
-"t01lap03296.pi.pvt:GC7:"
-"peplgp01313.corp.pep.pvt:S10:CIDB"
 "peplgp01257.pi.pvt:S35:CIDB"
 "t01lap03868.pi.pvt:S5H:APP CI"
-"pepldr03673.corp.pep.pvt:S61:CIDB"
 "peplap07880.pi.pvt:SH0:APP CI"
+"peplap07857.pi.pvt:D59:HANA DB"
+"pepldz00640.pi.pvt:DL1:CIDB"
 "peplgp01308.corp.pep.pvt:SX0:CIDB"
 )
+
+declare -a spec
+spec=(
+"PEPLAP05958:US7:APP01"
+"PEPLAP05962:US7:APP02"
+"PEPLAP05959:US7:ERS secondary"
+"PEPLAP05960:US7:ASCS"
+)
+
 
 declare -a global_ua
 global_ua=(
@@ -170,9 +174,9 @@ elif [[ $1 == "pgcs_qa" ]];then
 elif [[ $1 == "eur_sbx" ]];then
     servers=("${eur_sbx[@]}")
 elif [[ $1 == "eur_qa" ]];then
-    servers=("${pgcs_qa[@]}")
+    servers=("${eur_qa[@]}")
 elif [[ $1 == "eur_ua" ]];then
-    servers=("${pgcs_ua[@]}")
+    servers=("${eur_ua[@]}")
 elif [[ $1 == "global_sbx" ]];then
     servers=("${global_sbx[@]}")
 fi
@@ -207,31 +211,37 @@ do
 done
 
 
-
-declare -a suc
-declare -a fail
-suc=()
-fail=()
-
-
 run_scr() {
     IFS=: read -r host sid type <<< "$1"
     sid=$(echo $sid | tr '[:upper:]' '[:lower:]')
     if [[ $optionFlag == "start" ]]; then
-        response=$(pbrun -u "$sid"adm -h $host /bin/sh < start.sh)
+        if [[ $sid == *"UM7"*  ]]; then
+            echo "In UM7"
+            response=$(pbrun -u "$sid"adm -h $host /bin/sh < startum7.sh)
+        else
+            response=$(pbrun -u "$sid"adm -h $host /bin/sh < start.sh $sid $host $type)
+        fi
     elif [[ $optionFlag == "stop" ]]; then
-        response=$(pbrun -u "$sid"adm -h $host /bin/sh < stop.sh)
+        if [[ $sid == *"UM7"*  ]]; then
+            echo "In UM7"
+            response=$(pbrun -u "$sid"adm -h $host /bin/sh < stopum7.sh)
+        else
+            response=$(pbrun -u "$sid"adm -h $host /bin/sh < stop.sh)
+        fi
     elif [[ $optionFlag == "check" ]]; then
         response=$(pbrun -u "$sid"adm -h $host /bin/sh < check.sh)
+    elif [[ $optionFlag == "access" ]]; then
+        response=$(pbrun -u "$sid"adm -h $host /bin/sh < access.sh 2>&1)
     fi
     echo ""
-    echo "$sid" "$host" "$type"
     echo -en "$response"
-    if [ -n "$(echo "$response" | grep "SUCCEEDED")" ]; then
-        suc+="${host} ${sid}"
-    fi
-    if [ -n "$(echo "$response" | grep "FAILED")" ]; then
-        fail+="${host} ${sid}"
+    if [[ $sendOutput == "send" ]];then
+        printf -v data '{"message":"%s","logtype":"accesslogs", "service": "login-service", "hostname": "login.example.com"}' "$response"
+        curl    --location 'https://log-api.newrelic.com/log/v1' \
+                --header 'Api-Key: cfbbf2d6b30392ad0106eedaf2efeefdFFFFNRAL' \
+                --header 'Content-Type: application/json' \
+                --header 'Accept: */*' \
+                --data "$data"
     fi
     echo -e "\n-------------------------------------------------------"
 }
@@ -247,8 +257,23 @@ live_action() {
     echo ""
     echo "$sid" "$host" "$type"
     echo -en "$response"
+    printf -v data '{"message":"%s","logtype":"accesslogs", "service": "login-service", "hostname": "login.example.com"}' "$response"
+    curl    --location 'https://log-api.newrelic.com/log/v1' \
+            --header 'Api-Key: cfbbf2d6b30392ad0106eedaf2efeefdFFFFNRAL' \
+            --header 'Content-Type: application/json' \
+            --header 'Accept: */*' \
+            --data "$data"
     echo -e "\n-------------------------------------------------------"
 }
+
+
+
+
+declare -a suc
+declare -a fail
+
+suc=()
+fail=()
 
 
 if [[ $optionFlag == "start" ]]; then
@@ -263,7 +288,7 @@ if [[ $optionFlag == "start" ]]; then
 
     for str in "${ascs[@]}"
     do
-        run_scr "$str" &
+        run_scr "$str" suc fail &
     done
 
     wait
@@ -272,7 +297,7 @@ if [[ $optionFlag == "start" ]]; then
 
     for str in "${ers[@]}"
     do
-        run_scr "$str" &
+        run_scr "$str" suc fail &
     done
 
     wait
@@ -282,7 +307,7 @@ if [[ $optionFlag == "start" ]]; then
 
     for str in "${app_ci[@]}"
     do
-        run_scr "$str" &
+        run_scr "$str" suc fail &
     done
 
     wait
@@ -297,7 +322,7 @@ elif [[ $optionFlag == "stop" ]]; then
 
     for str in "${app_ci[@]}"
     do
-        run_scr "$str" &
+        run_scr "$str" suc fail &
     done
 
     wait
@@ -307,7 +332,7 @@ elif [[ $optionFlag == "stop" ]]; then
 
     for str in "${ers[@]}"
     do
-        run_scr "$str" &
+        run_scr "$str" suc fail &
     done
 
     wait
@@ -317,7 +342,7 @@ elif [[ $optionFlag == "stop" ]]; then
 
     for str in "${ascs[@]}"
     do
-        run_scr "$str" &
+        run_scr "$str" suc fail &
     done
 
     wait
@@ -326,18 +351,23 @@ elif [[ $optionFlag == "stop" ]]; then
 elif [[ $optionFlag == "check" ]]; then
     for str in "${servers[@]}"
     do
-        run_scr "$str" &
+        run_scr "$str" suc fail &
     done
 
     wait
+elif [[ $optionFlag == "access" ]]; then
+    for str in "${servers[@]}"
+    do
+        res=$(run_scr "$str")
+        if [[ $res == *"pb"* ]]; then
+            echo -en "${str};F;\n"
+            fail+=("$str")
+        else
+            echo -en "${str};S;\n"
+            suc+=("$str")
+        fi
+    done
 fi
-
-
-
-    
-
-typeset -p suc
-typeset -p fail
 
 echo "SUCCESSES"
 printf '%s\n' "${suc[@]}"

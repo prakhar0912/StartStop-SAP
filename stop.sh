@@ -10,17 +10,15 @@ print_err(){
     RED="\033[0;31m"
     NC="\033[0m"
     GREEN="\033[0;32m"
-    echo -en "\nFailure\n"
+    echo -en "\n${RED}${RED}Stop FAILED: $(hostname) : ${sid} : ${1}${NC}\n"
 }
 
 print_suc(){
     RED="\033[0;31m"
     NC="\033[0m"
     GREEN="\033[0;32m"
-    echo -en "\nSuccess\n"
+    echo -en "\n${GREEN}Stop SUCCEEDED: $(hostname) : ${sid} ${NC}\n"
 }
-
-
 
 checkcmd=$(startsap -c)
 
